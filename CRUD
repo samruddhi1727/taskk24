@@ -1,0 +1,64 @@
+import { useState, useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+
+import './App.css'
+
+function App() {
+  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm()
+  const [storageItems, setStorageItems] = useState([]);
+
+  const loginHandler = (data) => {
+    console.log(data.name)
+    const userdata = { name: data.name, email: data.email, password: data.password }
+    localStorage.setItem('userr', JSON.stringify({ userdata }))
+
+    afterlogin()
+    reset()
+
+  }
+
+  const afterlogin = () => {
+    const localstorageData = JSON.parse(localStorage.getItem('userr'));
+    console.log(localstorageData)
+  }
+
+  useEffect(() => {
+    const items = Object.entries(localStorage);
+    setStorageItems(items);
+  }, []);
+  return (
+    <>
+      <div className='loginContainer'>
+        {isSubmitting && <div className="loading">Loading..</div>}
+
+        <form onSubmit={handleSubmit(loginHandler)}>
+          <input
+            {...register("name", { required: true })}
+            type="text" placeholder="Enter your name"
+          />
+          <input
+            {...register("email", { required: true })}
+            type="email" placeholder="Enter your email"
+          />
+          <input
+            {...register("password", { required: true })}
+            type="password" placeholder="Enter password"
+          />
+          <button type="submit" disabled={isSubmitting}> Create </button>
+        </form>
+
+      </div>
+      <h1>local storage data</h1>
+
+      <ul>
+        {storageItems.map(([key, value]) => (<li key={key}><strong>{key}:</strong> {value} 
+        
+        <button onClick={() => { localStorage.removeItem("userr"); }}>remove</button>
+        </li>))}
+        
+      </ul>
+    </>
+  )
+}
+
+export default App
